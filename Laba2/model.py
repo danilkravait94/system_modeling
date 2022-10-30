@@ -10,9 +10,11 @@ class Model:
 
     def simulate(self, time):
         while self.tcurr < time:
+            # встановити t_next на max value of float
             self.tnext = float('inf')
 
             for item in self.list:
+                # знаходимо найменший з моментів часу
                 tnextValue = np.min(item.tnext)
                 if tnextValue < self.tnext:
                     self.tnext = tnextValue
@@ -21,8 +23,10 @@ class Model:
             for item in self.list:
                 item.doStatistics(self.tnext - self.tcurr)
 
+            # просунутися у часі вперед
             self.tcurr = self.tnext
 
+            # оновити поточний час для кожного елементу
             for item in self.list:
                 item.tcurr = self.tcurr
 
@@ -30,24 +34,66 @@ class Model:
                 self.list[self.event].outAct()
 
             for item in self.list:
-                if self.tcurr == item.tnext:
+                if self.tcurr in item.tnext:
                     item.outAct()
 
-            for item in self.list:
-                item.printInfo()
+            # for item in self.list:
+            #     item.printInfo()
 
-        return self.print_result()
+        self.printResult()
+        
+        return self.printChannelsResult()
 
-    def print_result(self):
+    def printResult(self):
+        print()
         print('-----RESULT-----')
 
         for e in self.list:
             e.printResult()
             if isinstance(e, Process):
-                mean_queue_length = e.meanqueue / self.tcurr
-
-                failure_probability = e.failure / (e.quantity + e.failure) if (e.quantity + e.failure) != 0 else 0
-
-                print(f"Average queue length: {mean_queue_length}")
-                print(f"Failure probability: {failure_probability}")
+                print(f"Average queue length: {self.get_meanqueue_length(e)}")
+                print(f"Failure probability: {self.get_failure_probability(e)}")
+                print(f"Average load: {self.get_meanload(e)}")
                 print()
+
+    def printChannelsResult(self):
+        print()
+        print('-----Channels result-----')
+
+        meanqueue_length_sum = 0
+        failure_probability_sum = 0
+        meanload_sum = 0
+        processors_count = 0
+
+        for e in self.list:
+            if isinstance(e, Process):
+                processors_count += 1
+
+                meanqueue_length_sum += self.get_meanqueue_length(e)
+                failure_probability_sum += self.get_failure_probability(e)
+                meanload_sum += self.get_meanload(e)
+
+        meanqueue_length_result = meanqueue_length_sum / processors_count
+        failure_probability_result = failure_probability_sum / processors_count
+        meanload_result = meanload_sum / processors_count
+
+        print(f"Average queue length: {meanqueue_length_result}")
+        print(f"Failure probability: {failure_probability_result}")
+        print(f"Average load: {meanload_result}")
+
+        print()
+
+        return {
+            "meanqueue_length_result": meanqueue_length_result,
+            "failure_probability_result": failure_probability_result,
+            "meanload_result": meanload_result
+        }
+
+    def get_failure_probability(self, e: Process):
+        return e.failure / (e.quantity + e.failure) if (e.quantity + e.failure) != 0 else 0
+    
+    def get_meanload(self, e: Process):
+        return e.meanload / self.tcurr
+    
+    def get_meanqueue_length(self, e: Process):
+        return e.meanqueue / self.tcurr

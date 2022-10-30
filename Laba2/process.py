@@ -10,29 +10,56 @@ class Process(Element):
         self.meanqueue = 0.0
         self.failure = 0
 
+        self.channels = channels
+        self.tnext = [np.inf] * self.channels
+        self.state = [0] * self.channels
+
+        self.probability = [1]
+
         self.meanload = 0
 
 
     def inAct(self):        
-        if (self.state == 0):
-            self.state = 1
-            self.tnext = self.tcurr + super().getDelay()
+        freeChannels = self.getAvailable()
+        if len(freeChannels) > 0:
+            for i in freeChannels:
+                self.state[i] = 1
+                self.tnext[i] = self.tcurr + super().getDelay()
+                break
         else:
             if self.queue < self.maxqueue:
                 self.queue += 1
             else:
                 self.failure += 1
 
-
     def outAct(self):
-        super().outAct()
-        self.tnext = np.inf
-        self.state = 0
-        if self.queue > 0:
-            self.queue -= 1
-            self.state = 1
-            self.tnext = self.tcurr + self.getDelay()
+        channels = self.getCurrent()
+        for i in channels:
+            super().outAct()
+            self.tnext[i] = np.inf
+            self.state[i] = 0
+            if self.queue > 0:
+                self.queue -= 1
+                self.state[i] = 1
+                self.tnext[i] = self.tcurr + self.getDelay()
+            if self.nextElement is not None:
+                next_el = np.random.choice(a=self.nextElement, p=self.probability)
+                next_el.inAct()
 
+    def getAvailable(self):
+        availableChannels = []
+        for i in range(self.channels):
+            if self.state[i] == 0:
+                availableChannels.append(i)
+
+        return availableChannels
+
+    def getCurrent(self):
+        channels = []
+        for i in range(self.channels):
+            if self.tnext[i] == self.tcurr:
+                channels.append(i)
+        return channels
     
     def printInfo(self):
         super().printInfo()
@@ -40,3 +67,11 @@ class Process(Element):
 
     def doStatistics(self, delta):
         self.meanqueue += self.queue * delta
+
+        # if self.queue > self.max_observed_queue:
+        #     self.max_observed_queue = self.queue
+
+        for i in range(self.channels):
+            self.meanload += self.state[i] * delta
+
+        self.meanload /= self.channels

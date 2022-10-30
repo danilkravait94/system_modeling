@@ -5,18 +5,18 @@ class Element:
     staticNextId = 0
 
     def __init__(self, delay=None, distribution=None):
-        self.tnext = 0
-        self.delayMean = delay
+        self.tnext = [0]  # момент часу наступної події
+        self.delayMean = delay  # середнє значення часової затримки
         self.distribution = distribution
-        self.tcurr = self.tnext
-        self.state = 0
-        self.nextElement = None
+        self.tcurr = self.tnext  # поточний момент часу
+        self.state = [0]
+        self.nextElement = None  # вказує на наступний (в маршруті слідування вимоги) елемент моделі
         
         self.id = Element.staticNextId
         Element.staticNextId += 1
 
         self.name = 'element' + str(self.id)
-        self.delayDev = None
+        self.delayDev = None  # середнє квадратичне відхилення часової затримки
         
         self.quantity = 0
         self.probability = [1]
