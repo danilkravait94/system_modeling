@@ -10,7 +10,7 @@ class Element:
         self.distribution = distribution
         self.tcurr = self.tnext  # поточний момент часу
         self.state = [0]
-        self.nextElement = None  # вказує на наступний (в маршруті слідування вимоги) елемент моделі
+        self.nextElement = None  # вказує на наступний елемент моделі
         
         self.id = Element.staticNextId
         Element.staticNextId += 1
@@ -31,7 +31,8 @@ class Element:
             return utility.uniform(self.delayMean, self.delayDev)
         else:
             return self.delayMean
-    
+
+    # гетери та сеттери, бо в пайтоні нема такого функціоналу, тому реалізуємо методами
     def get_state(self):
         return self.state
 
@@ -59,6 +60,7 @@ class Element:
     def outAct(self):
         self.quantity += 1
 
+    # методи для вивіду результатів
     def printResult(self):
         print(f'{self.name} quantity = {str(self.quantity)} state = {self.state}')
 

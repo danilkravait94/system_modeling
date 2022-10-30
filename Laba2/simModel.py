@@ -25,7 +25,6 @@ class Sim():
         model = Model(elements)
         res = model.simulate(1000)
 
-
     def task3(self):
         creator = Create(5)
 
@@ -34,10 +33,9 @@ class Sim():
         p3 = Process(5)
 
         creator.nextElement = [p1]
-        p1.nextElement = [p2, p3]
+        p1.nextElement = [p2]
+        p2.nextElement = [p3]
         
-        p1.probability = ([0.5, 0.5])
-
         p1.maxqueue = 5
         p2.maxqueue = 5
         p3.maxqueue = 5

@@ -6,8 +6,8 @@ class Create(Element):
         super().__init__(delay)
 
     def outAct(self):
-        # виконуємо збільшення лічильника кількості
+        # збільшуємо лічильник кількості
         super().outAct()
-        # встановлюємо коли пристрій буде вільним
+        # коли пристрій буде вільним
         self.tnext[0] = self.tcurr + self.getDelay()
         self.nextElement[0].inAct()

@@ -10,7 +10,7 @@ class Model:
 
     def simulate(self, time):
         while self.tcurr < time:
-            # встановити t_next на max value of float
+            # встановити tnext на max value of float
             self.tnext = float('inf')
 
             for item in self.list:
@@ -37,12 +37,13 @@ class Model:
                 if self.tcurr in item.tnext:
                     item.outAct()
 
+            # додаткова інформація про кожен процес
             # for item in self.list:
             #     item.printInfo()
 
         self.printResult()
         
-        return self.printChannelsResult()
+        return self.printTotalResult()
 
     def printResult(self):
         print()
@@ -56,9 +57,10 @@ class Model:
                 print(f"Average load: {self.get_meanload(e)}")
                 print()
 
-    def printChannelsResult(self):
+    # метод для фінальних результатів симуляції
+    def printTotalResult(self):
         print()
-        print('-----Channels result-----')
+        print('-----Total result-----')
 
         meanqueue_length_sum = 0
         failure_probability_sum = 0

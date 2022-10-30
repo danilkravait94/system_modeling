@@ -2,7 +2,7 @@ import numpy as np
 from element import Element
 
 class Process(Element):
-    def __init__(self, delay, channels=1):
+    def __init__(self, delay, threads=1):
         super().__init__(delay)
         self.queue = 0
 
@@ -10,9 +10,10 @@ class Process(Element):
         self.meanqueue = 0.0
         self.failure = 0
 
-        self.channels = channels
-        self.tnext = [np.inf] * self.channels
-        self.state = [0] * self.channels
+        # реалізація потоків для 5 завданя
+        self.threads = threads
+        self.tnext = [np.inf] * self.threads
+        self.state = [0] * self.threads
 
         self.probability = [1]
 
@@ -20,9 +21,9 @@ class Process(Element):
 
 
     def inAct(self):        
-        freeChannels = self.getAvailable()
-        if len(freeChannels) > 0:
-            for i in freeChannels:
+        freeThreads = self.getAvailable() # беремо вільні потоки для процесу
+        if len(freeThreads) > 0:
+            for i in freeThreads:
                 self.state[i] = 1
                 self.tnext[i] = self.tcurr + super().getDelay()
                 break
@@ -33,8 +34,8 @@ class Process(Element):
                 self.failure += 1
 
     def outAct(self):
-        channels = self.getCurrent()
-        for i in channels:
+        threads = self.getCurrent() # беремо загалні, які виконуються
+        for i in threads:
             super().outAct()
             self.tnext[i] = np.inf
             self.state[i] = 0
@@ -47,19 +48,19 @@ class Process(Element):
                 next_el.inAct()
 
     def getAvailable(self):
-        availableChannels = []
-        for i in range(self.channels):
+        threads = []
+        for i in range(self.threads):
             if self.state[i] == 0:
-                availableChannels.append(i)
+                threads.append(i)
 
-        return availableChannels
+        return threads
 
     def getCurrent(self):
-        channels = []
-        for i in range(self.channels):
+        threads = []
+        for i in range(self.threads):
             if self.tnext[i] == self.tcurr:
-                channels.append(i)
-        return channels
+                threads.append(i)
+        return threads
     
     def printInfo(self):
         super().printInfo()
@@ -68,10 +69,7 @@ class Process(Element):
     def doStatistics(self, delta):
         self.meanqueue += self.queue * delta
 
-        # if self.queue > self.max_observed_queue:
-        #     self.max_observed_queue = self.queue
-
-        for i in range(self.channels):
+        for i in range(self.threads):
             self.meanload += self.state[i] * delta
 
-        self.meanload /= self.channels
+        self.meanload /= self.threads
