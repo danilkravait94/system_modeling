@@ -1,6 +1,7 @@
 import numpy as np
 from task1_universal.process import Process
 from task2_bank.process import BankProcess
+from task3_hospital.process import HospitalProcess
 
 
 class Model:
@@ -53,7 +54,7 @@ class Model:
 
         for e in self.list:
             e.printResult()
-            isProcess = isinstance(e, Process) or isinstance(e, BankProcess)
+            isProcess = isinstance(e, Process) or isinstance(e, BankProcess) or isinstance(e, HospitalProcess)
             if isProcess:
                 print(f"Average queue length: {self.get_meanqueue_length(e)}")
                 print(f"Failure probability: {self.get_failure_probability(e)}")
@@ -71,7 +72,7 @@ class Model:
         processors_count = 0
 
         for e in self.list:
-            isProcess = isinstance(e, Process) or isinstance(e, BankProcess)
+            isProcess = isinstance(e, Process) or isinstance(e, BankProcess) or isinstance(e, HospitalProcess)
             if isProcess:
                 processors_count += 1
 

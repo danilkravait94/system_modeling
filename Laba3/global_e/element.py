@@ -93,6 +93,8 @@ class Element:
             return utility.normal(self.delayMean, self.delayDev)
         elif 'uniform' == self.distribution:
             return utility.uniform(self.delayMean, self.delayDev)
+        elif 'erlang' == self.distribution:
+            return utility.erlang(self.delayMean, self.delayDev)
         else:
             return self.delayMean
 
