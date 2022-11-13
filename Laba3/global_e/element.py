@@ -1,5 +1,3 @@
-import math
-import sys
 import global_e.utility as utility
 import numpy as np
 
@@ -39,7 +37,6 @@ class Element:
         self.priorities = Element.defaultArray
 
         self.queue = 0
-        # self.max_observed_queue = 0
         self.maxqueue = maxqueue
         self.meanqueue = 0.0
         self.threads = threads
